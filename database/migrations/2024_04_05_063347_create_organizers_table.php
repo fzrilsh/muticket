@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('organizers', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained('users');
             $table->string('email');
             $table->string('name');
             $table->string('telephone');
