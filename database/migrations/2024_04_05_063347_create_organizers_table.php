@@ -19,6 +19,9 @@ return new class extends Migration
             $table->string('telephone');
             $table->string('instagram');
             $table->string('full_name');
+            $table->enum('status', ['pending', 'clear'])->default('pending');
+            $table->enum('status_wa', ['pending', 'clear'])->default('pending');
+            $table->string('signature_path');
             $table->timestamps();
         });
     }
