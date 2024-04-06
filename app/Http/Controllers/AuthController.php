@@ -15,9 +15,9 @@ class AuthController extends Controller
     public function Login(Request $request){
         if($this->validator([
             'email' => 'required|email',
-            'password' => 'required|password'
+            'password' => 'required|min:8'
         ])->fails()) return response()->json(['message' => 'Invalid field', 'errors' => $this->validation_errors], 422);
-        if(!Auth::attempt($request->all())) return response()->json(['message' => 'Email or Password incorrect']);
+        if(!Auth::attempt($request->only(['email', 'password']))) return response()->json(['message' => 'Email or Password incorrect']);
 
         $user = User::where('email', $request->email)->firstOrFail();
         $token = $user->createToken('user_token')->plainTextToken;
@@ -54,28 +54,29 @@ class AuthController extends Controller
         if($this->validator([
             'name' => 'required',
             'full_name' => 'required',
-            'telephone' => 'required|numeric|regex:/^(\+62|62|0)8[1-9][0-9]{6,9}$/',
-            'instagram' => 'required|regex:/^[a-zA-Z0-9_]*$/',
-            'photo_ktp' => 'required|image',
-            'nik_ktp' => 'required|numeric',
-            'signed' => 'required|image'
+            'telephone' => 'required|numeric|regex:/^628\d{9,12}$/',
+            'instagram' => 'required|regex:/^[a-z0-9_]*$/',
+            'photo_ktp' => 'required|image|mimes:jpg,png,jpeg',
+            'nik_ktp' => 'required|numeric|regex:/^[0-9]{16}$/',
+            'signed' => 'required|image|mimes:jpg,png,jpeg'
         ])->fails()) return response()->json(['message' => 'Invalid field', 'errors' => $this->validation_errors]);
+        if(Organizer::where('user_id', Auth::user()->id)->first()) return response()->json(['message' => 'You have submitted your registration, wait 1x24 during working hours for us to validate it'], 400);
 
         $signature = $request->file('signed');
-        $signature_path = $signature->storeAs('/signature', name: Auth::user()->id);
+        $signature_path = $signature->storeAs('/signature', name: Auth::user()->id.'.'.$signature->getClientOriginalExtension());
 
         $ktp = $request->file('photo_ktp');
-        $ktp_path = $ktp->storeAs('/ktp', name: Auth::user()->id);
+        $ktp_path = $ktp->storeAs('/ktp', name: Auth::user()->id.'.'.$ktp->getClientOriginalExtension());
 
-//        Organizer::create([
-//            'user_id' => Auth::user()->id,
-//            'email' => Auth::user()->email,
-//            'name' => $request->name,
-//            'telephone' => $request->telephone,
-//            'instagram' => $request->instagram,
-//            'full_name' => $request->full_name,
-//            'signature_path' => $path
-//        ]);
+        Organizer::create([
+            'user_id' => Auth::user()->id,
+            'email' => Auth::user()->email,
+            'name' => $request->name,
+            'telephone' => $request->telephone,
+            'instagram' => $request->instagram,
+            'full_name' => $request->full_name,
+            'signature_path' => $signature_path
+        ]);
 
 //        Mail::to('hai@fazrilsh.my.id')->send(new OrganizerValidation([
 //            'ktp' => $ktp_path,
