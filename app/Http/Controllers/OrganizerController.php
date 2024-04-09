@@ -2,70 +2,32 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Middleware\OrganizerMiddleware;
 use App\Jobs\sendWhatsappJob;
 use App\Mail\OrganizerValidation;
 use App\Models\Organizer;
-use App\Models\User;
 use App\Utils\Whatsapp;
 use Illuminate\Http\Request;
-use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
-use Ramsey\Uuid\Uuid;
 
-class AuthController extends Controller implements HasMiddleware
+class OrganizerController extends Controller
 {
     public static function middleware()
     {
         return [
-            new Middleware('auth:sanctum', only: ['Logout', 'RegisterOrganizer'])
+            new Middleware('auth:sanctum'),
+            new Middleware(OrganizerMiddleware::class, only: ['index'])
         ];
     }
 
-    public function Login(Request $request){
-        if($this->validator([
-            'email' => 'required|email',
-            'password' => 'required|min:8'
-        ])->fails()) return response()->json(['message' => 'Invalid field', 'errors' => $this->validation_errors], 422);
-        if(!Auth::attempt($request->only(['email', 'password']))) return response()->json(['message' => 'Email or Password incorrect']);
+    public function index(){
 
-        $user = User::where('email', $request->email)->firstOrFail();
-        $token = $user->createToken('user_token')->plainTextToken;
-        Auth::login($user, true);
-
-        return response()->json([
-            'message' => 'Login success',
-            'access_token' => $token
-        ]);
     }
 
-    public function Register(Request $request){
-        if($this->validator([
-            'name' => 'required',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|min:8|confirmed'
-        ])->fails()) return response()->json(['message' => 'Invalid field', 'errors' => $this->validation_errors], 422);
-
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password)
-        ]);
-        Auth::login($user, true);
-
-        $token = $user->createToken('user_token')->plainTextToken;
-        return response()->json([
-            'message' => 'Register success',
-            'access_token' => $token
-        ]);
-    }
-
-    public function RegisterOrganizer(Request $request): \Illuminate\Http\JsonResponse
-    {
+    public function store(Request $request){
         if($this->validator([
             'name' => 'required',
             'full_name' => 'required',

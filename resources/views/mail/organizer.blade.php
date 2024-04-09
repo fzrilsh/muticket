@@ -1,12 +1,15 @@
-<x-mail::message>
-# Information Organizer
+# Validation Organizer
 
-The body of your message.
+<p>
+    Full Name: {{$data['full_name']}}<br>
+    Nik: {{$data['nik']}}
+</p>
 
-<x-mail::button :url="''">
-Button Text
-</x-mail::button>
+<a href="{{$url}}">
+    <button>
+        Click
+    </button>
+</a><br><br>
 
 Thanks,<br>
 {{ config('app.name') }}
-</x-mail::message>

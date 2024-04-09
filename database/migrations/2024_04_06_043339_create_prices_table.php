@@ -16,7 +16,10 @@ return new class extends Migration
             $table->foreignId('event_id')->constrained('events');
             $table->string('name');
             $table->integer('price');
-            $table->text('notes')->nullable();
+            $table->integer('capacity');
+            $table->integer('max')->default(1);
+            $table->enum('status', ['active', 'nonactive'])->default('active');
+            $table->text('notes')->nullable()->default('');
             $table->timestamps();
         });
     }

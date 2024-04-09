@@ -15,7 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->nullable()->constrained('users');
             $table->foreignId('event_id')->constrained('events');
-            $table->enum('status', ['nothing', 'pending', 'booked', 'refund', 'checkin', 'expired']);
+            $table->foreignId('price_id')->nullable()->constrained('prices');
+            $table->enum('status', ['nothing', 'pending', 'booked', 'refund', 'checkin', 'expired'])->default('nothing');
             $table->date('booked_at')->nullable();
         });
     }

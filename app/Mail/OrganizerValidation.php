@@ -38,7 +38,7 @@ class OrganizerValidation extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'view.mail.organizer',
+            view: 'mail.organizer',
         );
     }
 
@@ -50,8 +50,13 @@ class OrganizerValidation extends Mailable
     public function attachments(): array
     {
         return [
-            Attachment::fromStorage($this->data['ktp']),
-            Attachment::fromStorage($this->data['signature'])
+            Attachment::fromStorage($this->data['ktp'])->as('ktp'),
+            Attachment::fromStorage($this->data['signature'])->as('signature')
         ];
+    }
+
+    protected function buildMarkdownView()
+    {
+        return $this->markdown('mail.organizer');
     }
 }

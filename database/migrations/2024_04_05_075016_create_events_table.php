@@ -13,10 +13,11 @@ return new class extends Migration
     {
         Schema::create('events', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('users');
+            $table->foreignId('organizer_id')->constrained('organizers');
             $table->string('banner_path');
             $table->string('thumbnail_path');
             $table->string('name');
+            $table->string('slug');
             $table->enum('category', ['Music Concerts', 'Seminar', 'Art Festivals', 'Theater', 'Galas', 'Sports', 'Workshops']);
             $table->integer('capacity');
             $table->dateTime('start_at');
@@ -26,10 +27,10 @@ return new class extends Migration
             $table->string('province');
             $table->string('city');
             $table->string('zip');
-            $table->geography('coordinates', subtype: 'point');
+            $table->string('coordinates');
             $table->text('description');
-            $table->text('refund_rules');
-            $table->string('keywords');
+            $table->text('refund_rules')->nullable()->default('');
+            $table->string('keywords')->nullable()->default('');
             $table->timestamps();
         });
     }

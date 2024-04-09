@@ -17,6 +17,8 @@ class Organizer extends Model
         'instagram',
         'full_name',
         'status',
-        'signature_path'
+        'signature_path',
+        'status_Wa',
+        'status'
     ];
 }
