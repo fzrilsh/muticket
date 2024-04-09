@@ -16,4 +16,5 @@ class OrganizerMiddleware
 //            return \response()->json(['message' => 'Complete or please register your organization to register the event on our service'], 401);
         return $next($request);
     }
+
 }
